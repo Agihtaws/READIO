@@ -1,0 +1,156 @@
+.header {
+  width: 100%;
+  background-color: var(--header-bg);
+  color: var(--header-text);
+  padding: 1rem 0;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.headerContainer {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logoContainer {
+  flex-shrink: 0;
+}
+
+.logo {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--header-text);
+  text-decoration: none;
+}
+
+.nav {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.navList {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+  gap: 2rem;
+}
+
+.navItem {
+  margin: 0;
+}
+
+.navItem a {
+  color: var(--header-text);
+  text-decoration: none;
+  padding: 0.5rem 0;
+  transition: opacity 0.2s;
+  font-size: 1rem;
+}
+
+.navItem a:hover {
+  opacity: 0.8;
+}
+
+.loginButton {
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 1.5rem !important;
+  border-radius: 4px;
+  transition: background-color 0.2s !important;
+}
+
+.loginButton:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  opacity: 1 !important;
+}
+
+.userProfile {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.userInfo {
+  text-align: right;
+}
+
+.userName {
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.2;
+  color: var(--header-text);
+}
+
+.userEmail {
+  font-size: 0.8rem;
+  margin: 0;
+  opacity: 0.8;
+  color: var(--header-text);
+}
+
+.avatarCircle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.logoutButton {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.logoutButton:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 768px) {
+  .headerContainer {
+    flex-direction: column;
+    padding: 1rem;
+  }
+  
+  .logoContainer {
+    margin-bottom: 1rem;
+  }
+  
+  .navList {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .userProfile {
+    margin-top: 1rem;
+    flex-direction: column;
+  }
+  
+  .userInfo {
+    text-align: center;
+  }
+}
+
