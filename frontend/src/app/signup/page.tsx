@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,9 +11,16 @@ export default function Signup() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-const [isLoading, setIsLoading] = useState(false);
-const { signup, signInWithGoogle } = useAuth() as { signup: (email: string, password: string) => Promise<void>; signInWithGoogle: () => Promise<void>; };
-const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const { signup, signInWithGoogle, user } = useAuth();
+  const router = useRouter();
+  
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (user) {
+      router.push('/');
+    }
+  }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,6 +64,11 @@ const router = useRouter();
       setIsLoading(false);
     }
   };
+  
+  // Show loading or nothing while checking auth state
+  if (user) {
+    return null; // Don't render anything while redirecting
+  }
 
   return (
     <div className={styles.authContainer}>
