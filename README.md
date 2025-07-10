@@ -196,4 +196,8 @@ npm run dev
 ✨ **Next.js** – for the frontend framework  
 ✨ **FastAPI** – for the backend framework  
 
+## 🎥 Demo Video ⭐
+
+[![Watch the video](https://img.youtube.com/vi/RMHvUpq3rio/0.jpg)](https://www.youtube.com/watch?v=RMHvUpq3rio)
+
 
