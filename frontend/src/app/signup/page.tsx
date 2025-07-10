@@ -15,10 +15,9 @@ export default function Signup() {
   const { signup, signInWithGoogle, user } = useAuth();
   const router = useRouter();
   
-  // Redirect if user is already logged in
   useEffect(() => {
     if (user) {
-      router.push('/');
+      router.replace('/', { scroll: false });
     }
   }, [user, router]);
 
@@ -35,7 +34,7 @@ export default function Signup() {
 
     try {
       await signup(email, password);
-      router.push('/');
+      router.replace('/', { scroll: false });
     } catch (error: any) {
       console.error('Signup error:', error);
       if (error.code === 'auth/email-already-in-use') {
@@ -56,7 +55,7 @@ export default function Signup() {
 
     try {
       await signInWithGoogle();
-      router.push('/');
+      router.replace('/', { scroll: false });
     } catch (error: any) {
       console.error('Google sign in error:', error);
       setError('Failed to sign in with Google. Please try again.');
@@ -65,9 +64,8 @@ export default function Signup() {
     }
   };
   
-  // Show loading or nothing while checking auth state
   if (user) {
-    return null; // Don't render anything while redirecting
+    return null;
   }
 
   return (
@@ -146,3 +144,4 @@ export default function Signup() {
     </div>
   );
 }
+
