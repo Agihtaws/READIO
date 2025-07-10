@@ -1,5 +1,6 @@
 # 📚 Readio: AI-Powered Study Assistant
 
+![Readio Logo](/frontend/public/Screenshot 2025-07-10 141933.png)
 
 **Readio** is a powerful AI study assistant that transforms text into interactive learning materials. It helps students learn more effectively by generating **summaries**, **flashcards**, **MCQs**, **translations**, and provides **AI chat assistance**.
 
