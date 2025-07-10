@@ -573,6 +573,9 @@ async def generate_mcqs(request: TextRequest):
             Each question must have EXACTLY ONE correct answer and three plausible distractors.
             Each question must have a detailed explanation for why the correct answer is right and why others are wrong.
             
+            IMPORTANT: Vary which option (A, B, C, or D) is the correct answer across different questions.
+            Do not make option A always the correct answer - distribute correct answers randomly among all options.
+            
             Analyze the content carefully and create an appropriate number of questions:
             - For simple or short content, create fewer questions (3-5)
             - For medium complexity or length, create a moderate number of questions (5-15)
@@ -644,6 +647,9 @@ async def generate_mcqs(request: TextRequest):
         2. Four options (A, B, C, D) with EXACTLY ONE correct answer
         3. A detailed explanation for why the correct answer is right and why the others are incorrect
         
+        IMPORTANT REQUIREMENT: Distribute the correct answers randomly among options A, B, C, and D.
+        DO NOT always make option A the correct answer. Vary which option is correct across different questions.
+        
         Format the output as a JSON array of objects with 'question', 'options', and 'explanation' properties.
         The 'options' should be an array of objects, each with 'text' and 'isCorrect' properties.
         
@@ -660,6 +666,26 @@ async def generate_mcqs(request: TextRequest):
               {{"text": "Madrid", "isCorrect": false}}
             ],
             "explanation": "Paris is the capital of France. London is the capital of the UK, Berlin is the capital of Germany, and Madrid is the capital of Spain."
+          }},
+          {{
+            "question": "Which element has the chemical symbol 'O'?",
+            "options": [
+              {{"text": "Osmium", "isCorrect": false}},
+              {{"text": "Oxygen", "isCorrect": true}},
+              {{"text": "Gold", "isCorrect": false}},
+              {{"text": "Silver", "isCorrect": false}}
+            ],
+            "explanation": "Oxygen has the chemical symbol 'O'. Osmium is 'Os', Gold is 'Au', and Silver is 'Ag'."
+          }},
+          {{
+            "question": "Who wrote 'Romeo and Juliet'?",
+            "options": [
+              {{"text": "Charles Dickens", "isCorrect": false}},
+              {{"text": "Jane Austen", "isCorrect": false}},
+              {{"text": "William Shakespeare", "isCorrect": true}},
+              {{"text": "Mark Twain", "isCorrect": false}}
+            ],
+            "explanation": "William Shakespeare wrote 'Romeo and Juliet'. Charles Dickens wrote 'Oliver Twist', Jane Austen wrote 'Pride and Prejudice', and Mark Twain wrote 'Adventures of Huckleberry Finn'."
           }}
         ]
         
@@ -670,7 +696,7 @@ async def generate_mcqs(request: TextRequest):
         results = (await workflow.custom(
             name="create-mcqs",
             objective=custom_prompt,
-            instructions=f"Generate approximately {recommended_count} high-quality MCQs in JSON format with EXACTLY ONE correct answer per question",
+            instructions=f"Generate approximately {recommended_count} high-quality MCQs in JSON format with EXACTLY ONE correct answer per question. Make sure to vary which option (A, B, C, or D) is correct.",
             agents=[agent],
         ).run_tasks())["results"]
         
@@ -729,19 +755,22 @@ async def generate_mcqs(request: TextRequest):
                         # Count correct answers
                         correct_count = sum(1 for opt in mcq["options"] if opt.get("isCorrect") is True)
                         
-                        # If no correct answers, mark the first one as correct
+                        # If no correct answers, mark a random one as correct (not always the first)
                         if correct_count == 0 and len(mcq["options"]) > 0:
-                            mcq["options"][0]["isCorrect"] = True
+                            import random
+                            random_index = random.randint(0, len(mcq["options"]) - 1)
+                            mcq["options"][random_index]["isCorrect"] = True
                         
-                        # If multiple correct answers, keep only the first one as correct
+                        # If multiple correct answers, keep only one as correct (randomly)
                         if correct_count > 1:
-                            found_first = False
-                            for opt in mcq["options"]:
-                                if opt.get("isCorrect") is True:
-                                    if found_first:
-                                        opt["isCorrect"] = False
-                                    else:
-                                        found_first = True
+                            # Find all correct options
+                            correct_indices = [i for i, opt in enumerate(mcq["options"]) if opt.get("isCorrect") is True]
+                            # Choose one randomly to keep as correct
+                            import random
+                            keep_index = random.choice(correct_indices)
+                            # Set all others to incorrect
+                            for i, opt in enumerate(mcq["options"]):
+                                opt["isCorrect"] = (i == keep_index)
                 
                 return {"mcqs": mcqs_data}
             
@@ -753,14 +782,25 @@ async def generate_mcqs(request: TextRequest):
             print(f"Results type: {type(results)}")
             print(f"Results content: {results}")
             
-                       # Create default MCQs as fallback
+            # Create default MCQs as fallback with randomized correct answers
+            import random
             default_mcqs = [
                 {
                     "question": "What is the main topic of this text?",
                     "options": [
-                        {"text": "The text content", "isCorrect": True},
-                        {"text": "Something else", "isCorrect": False},
+                        {"text": "The text content", "isCorrect": False},
+                        {"text": "Something else", "isCorrect": True},
                         {"text": "Not related", "isCorrect": False},
+                        {"text": "None of the above", "isCorrect": False}
+                    ],
+                    "explanation": "This is a default question because we couldn't parse the MCQs."
+                },
+                {
+                    "question": "What should you do next?",
+                    "options": [
+                        {"text": "Try again", "isCorrect": False},
+                        {"text": "Check your input", "isCorrect": False},
+                        {"text": "Contact support", "isCorrect": True},
                         {"text": "None of the above", "isCorrect": False}
                     ],
                     "explanation": "This is a default question because we couldn't parse the MCQs."
@@ -770,16 +810,21 @@ async def generate_mcqs(request: TextRequest):
             
     except Exception as e:
         print(f"Exception in MCQs generation: {str(e)}")
-        # Return a default set of MCQs instead of an error
+        # Return a default set of MCQs instead of an error with randomized correct answers
+        import random
+        correct_index = random.randint(0, 3)
+        options = [
+            {"text": "Try again", "isCorrect": False},
+            {"text": "Check your input", "isCorrect": False},
+            {"text": "Verify API connection", "isCorrect": False},
+            {"text": "Contact support", "isCorrect": False}
+        ]
+        options[correct_index]["isCorrect"] = True
+        
         default_mcqs = [
             {
                 "question": "Error occurred while generating MCQs.",
-                "options": [
-                    {"text": "Try again", "isCorrect": True},
-                    {"text": "Check your input", "isCorrect": False},
-                    {"text": "Verify API connection", "isCorrect": False},
-                    {"text": "Contact support", "isCorrect": False}
-                ],
+                "options": options,
                 "explanation": "There was an error generating MCQs. Please try again with different text."
             }
         ]
