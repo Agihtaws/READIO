@@ -14,10 +14,9 @@ export default function Login() {
   const { login, signInWithGoogle, user } = useAuth();
   const router = useRouter();
   
-  // Redirect if user is already logged in
   useEffect(() => {
     if (user) {
-      router.push('/');
+      router.replace('/', { scroll: false });
     }
   }, [user, router]);
 
@@ -28,7 +27,7 @@ export default function Login() {
 
     try {
       await login(email, password);
-      router.push('/');
+      router.replace('/', { scroll: false });
     } catch (error: any) {
       console.error('Login error:', error);
       if (error.code === 'auth/invalid-credential') {
@@ -47,7 +46,7 @@ export default function Login() {
 
     try {
       await signInWithGoogle();
-      router.push('/');
+      router.replace('/', { scroll: false });
     } catch (error: any) {
       console.error('Google sign in error:', error);
       setError('Failed to sign in with Google. Please try again.');
@@ -56,9 +55,8 @@ export default function Login() {
     }
   };
   
-  // Show loading or nothing while checking auth state
   if (user) {
-    return null; // Don't render anything while redirecting
+    return null;
   }
 
   return (
@@ -125,3 +123,4 @@ export default function Login() {
     </div>
   );
 }
+
